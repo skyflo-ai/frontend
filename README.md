@@ -1,3 +1,13 @@
 # skyflo-frontend
 
-A personal assistant for using chatgpt in a better way for daily recurring tasks.
+LLM agents for your cloud platform.
+
+## Run the frontend
+
+The skyflo-backend Django server is required for this to run.
+
+```bash
+yarn install
+
+yarn dev
+```

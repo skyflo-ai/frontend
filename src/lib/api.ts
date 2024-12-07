@@ -11,7 +11,7 @@ export async function fetchFlowDiagram(query: string) {
     const params = new URLSearchParams({ query: query });
 
     const response = await fetch(
-      `${process.env.API_URL}/flow-diagram-real-time/?${params}`,
+      `${process.env.API_URL}/flow-diagram-knowledge-graph/?${params}`,
       {
         method: "GET",
         credentials: "include",

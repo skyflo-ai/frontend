@@ -5,6 +5,9 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import Navbar from "@/components/navbar/Navbar";
 import { AiAssistantInterface } from "@/components/ai-assistant-interface";
 import { ChatInterface } from "@/components/ChatInterface";
+import Onboarding from "@/components/Onboarding";
+import PostSetup from "@/components/PostSetup";
+
 import { fetchFlowDiagram } from "@/lib/api";
 import Flow from "@/components/visualizer/Flow";
 
@@ -101,11 +104,13 @@ export default function DashboardPage() {
       <Navbar user={user} clearFlowData={clearFlowData} />
       {!querySubmitted && (
         <div className="flex-grow">
-          <AiAssistantInterface
+          {/* <AiAssistantInterface
             setQuerySubmitted={setQuerySubmitted}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-          />
+          /> */}
+          <Onboarding />
+          {/* <PostSetup /> */}
         </div>
       )}
       {querySubmitted && (
