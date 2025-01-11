@@ -20,6 +20,9 @@ import {
 type User = {
   email: string;
   plan: string;
+  company: {
+    plan: string;
+  };
 };
 
 export default function Navbar({
@@ -57,7 +60,7 @@ export default function Navbar({
           <BottomMenu
             icon={<Menu size={20} />}
             userEmail={user?.email}
-            userPlan={user?.plan}
+            userPlan={user?.company?.plan}
           />
         </div>
       </TooltipProvider>

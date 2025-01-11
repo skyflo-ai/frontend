@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import Navbar from "@/components/navbar/Navbar";
 import Agents from "@/components/Agents";
+import PostSetup from "@/components/PostSetup";
 
 export default function AgentsPage() {
   const { user } = useAuth();
+  const [showPostSetup, setShowPostSetup] = useState(true);
 
   return (
     <div className="flex">
@@ -17,7 +19,7 @@ export default function AgentsPage() {
         }}
       />
       <div className="flex-grow">
-        <Agents />
+        {showPostSetup ? <PostSetup /> : <Agents />}
       </div>
     </div>
   );

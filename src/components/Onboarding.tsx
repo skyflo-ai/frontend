@@ -29,6 +29,7 @@ export default function ConnectCloudPage() {
   const [selectedProvider, setSelectedProvider] = useState<"aws" | null>(null);
   const [accessKeyId, setAccessKeyId] = useState("");
   const [secretAccessKey, setSecretAccessKey] = useState("");
+  const [region, setRegion] = useState("");
 
   const handleSelectProvider = (provider: "aws") => {
     setSelectedProvider(provider);
@@ -167,6 +168,22 @@ export default function ConnectCloudPage() {
                     className="bg-gray-800 text-white w-full rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
                     value={secretAccessKey}
                     onChange={(e) => setSecretAccessKey(e.target.value)}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-300 text-sm font-semibold mb-2"
+                    htmlFor="region"
+                  >
+                    Region
+                  </label>
+                  <input
+                    id="region"
+                    type="text"
+                    className="bg-gray-800 text-white w-full rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
                   />
                 </div>
 

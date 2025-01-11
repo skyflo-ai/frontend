@@ -6,7 +6,6 @@ import Navbar from "@/components/navbar/Navbar";
 import { AiAssistantInterface } from "@/components/ai-assistant-interface";
 import { ChatInterface } from "@/components/ChatInterface";
 import Onboarding from "@/components/Onboarding";
-import PostSetup from "@/components/PostSetup";
 
 import { fetchFlowDiagram } from "@/lib/api";
 import Flow from "@/components/visualizer/Flow";
@@ -110,7 +109,6 @@ export default function DashboardPage() {
             setSearchQuery={setSearchQuery}
           /> */}
           <Onboarding />
-          {/* <PostSetup /> */}
         </div>
       )}
       {querySubmitted && (
