@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button'
-import { ArrowRight } from 'lucide-react'
-import Image from 'next/image'
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function Hero() {
   return (
@@ -11,10 +11,11 @@ export default function Hero() {
             Simplify Cloud Management with Conversational AI
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-300">
-            Say goodbye to complex dashboards. Manage your cloud infrastructure as easily as chatting with a colleague.
+            Say goodbye to complex dashboards. Manage your cloud infrastructure
+            as easily as chatting with a colleague.
           </p>
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-900">
               Start Free Trial
             </Button>
             <Button size="lg" variant="outline" className="group">
@@ -34,6 +35,5 @@ export default function Hero() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { Home, Menu, History, Flag } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-// import NavIcon from "@/components/navbar/NavIcon";
 
 import { LogOut, Settings, User, CreditCard } from "lucide-react"; // Example icons
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -37,7 +36,7 @@ export default function Navbar({
       {/* Logo placeholder */}
       <div className="w-10 h-10 rounded-full mb-8">
         <img
-          src="/logo_v0.webp"
+          src="/logo_v1.webp"
           alt="logo"
           className="w-full h-full rounded-full"
         />

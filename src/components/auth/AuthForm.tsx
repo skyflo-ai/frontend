@@ -71,7 +71,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isLogin }) => {
       />
       {error && <p className="text-red-500">{error}</p>}
       <Button
-        className="w-full mt-4 bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800 leading-tight py-4  rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-full mt-4 bg-blue-900 hover:bg-blue-900 text-blue-300 border border-blue-800 leading-tight py-4  rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
         type="submit"
         disabled={loading}
       >

@@ -58,7 +58,7 @@ export default function LoginPage() {
                   <TabsTrigger
                     key={tab}
                     value={tab}
-                    className="rounded-md text-gray-300 data-[state=active]:bg-blue-950 data-[state=active]:text-blue-300  py-2 leading-tight font-semibold transition-all duration-300 data-[state=active]:border-blue-800 border border-gray-500 mx-1 text-gray-400 hover:bg-gray-800"
+                    className="rounded-md text-gray-300 data-[state=active]:bg-blue-900 data-[state=active]:text-blue-300  py-2 leading-tight font-semibold transition-all duration-300 data-[state=active]:border-blue-800 border border-gray-500 mx-1 text-gray-400 hover:bg-gray-800"
                   >
                     {tab === "login" ? "Login" : "Register"}
                   </TabsTrigger>

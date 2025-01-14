@@ -93,7 +93,7 @@ export default function PostSetup() {
             </p>
             <Button
               variant="primary"
-              className="absolute bottom-6 bg-blue-700 hover:bg-blue-600 text-white"
+              className="absolute bottom-6 bg-blue-900 hover:bg-blue-600 text-white"
               onClick={() => {
                 // If desired, navigate the user to another part of the app
                 // For example: router.push("/dashboard") if using next/router

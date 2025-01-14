@@ -20,10 +20,8 @@ import CustomNode from "./CustomNode";
 
 import { GrPowerReset } from "react-icons/gr";
 import { RiDownloadLine } from "react-icons/ri";
-import { TbViewportWide } from "react-icons/tb";
 
 import { downloadImage } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
 
 function Flow({ flowData, isLoading }: { flowData: any; isLoading: boolean }) {
   return (

@@ -2,9 +2,9 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowUp, Loader2 } from "lucide-react";
-import { Footer } from "@/components/footer";
-import { FormEventHandler } from "react";
+import { ArrowUp } from "lucide-react";
+import { Footer } from "@/components/Footer";
+
 export function AiAssistantInterface({
   setQuerySubmitted,
   searchQuery,

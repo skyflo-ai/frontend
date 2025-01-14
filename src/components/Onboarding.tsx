@@ -215,7 +215,7 @@ export default function ConnectCloudPage() {
             {step === "viewPolicy" && selectedProvider === "aws" && (
               <Button
                 variant="primary"
-                className="bg-blue-700 hover:bg-blue-600 text-white ml-auto"
+                className="bg-blue-900 hover:bg-blue-600 text-white ml-auto"
                 onClick={handleNextFromPolicy}
               >
                 Next
@@ -224,7 +224,7 @@ export default function ConnectCloudPage() {
             {step === "enterCredentials" && (
               <Button
                 variant="primary"
-                className="bg-blue-700 hover:bg-blue-600 text-white ml-auto"
+                className="bg-blue-900 hover:bg-blue-600 text-white ml-auto"
                 onClick={() => {
                   // TODO: Handle form submission, securely send encrypted credentials to backend
                 }}

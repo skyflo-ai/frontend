@@ -9,30 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FaPlus } from "react-icons/fa";
+import { Agent } from "@/lib/types/agent";
 
-// Example agents fetched from the backend.
-const agents = [
-  {
-    title: "QA Agent",
-    description: "Your Cloud Q&A Companion",
-    detailed_description:
-      "Ask questions about your cloud environment and get insights from the data we've collected.",
-  },
-  {
-    title: "Create / Update Agent",
-    description: "Your Cloud Q&A Companion",
-    detailed_description:
-      "Ask questions about your cloud environment and get insights from the data we've collected.",
-  },
-  {
-    title: "Delete Agent",
-    description: "Your Cloud Q&A Companion",
-    detailed_description:
-      "Ask questions about your cloud environment and get insights from the data we've collected.",
-  },
-];
+interface AgentsProps {
+  agents: Agent[];
+  setSelectedAgent: (agent: Agent) => void;
+}
 
-export default function AgentsPage() {
+export default function Agents({ agents, setSelectedAgent }: AgentsProps) {
   return (
     <div className="relative min-h-screen flex p-4 sm:p-6 md:p-8 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black to-gray-900" />
@@ -66,6 +50,7 @@ export default function AgentsPage() {
               key={index}
               className="cursor-pointer"
               onClick={() => {
+                setSelectedAgent(agent);
                 // TODO: Navigate to the specific agent interface
               }}
             >

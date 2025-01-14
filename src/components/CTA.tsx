@@ -14,7 +14,7 @@ export default function CTA() {
           future of cloud management today.
         </p>
         <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-900">
             Start Your Free Trial
           </Button>
           <Button size="lg" variant="outline" className="group">
