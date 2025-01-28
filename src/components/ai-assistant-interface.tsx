@@ -15,7 +15,7 @@ export function AiAssistantInterface({
   setSearchQuery: (query: string) => void;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col items-center justify-between p-4">
+    <div className="  bg-gradient-to-b from-gray-900 to-black text-white flex flex-col items-center justify-between p-4">
       {/* <div className="fixed top-0 left-0 right-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm p-2 text-sm text-center">
         Need more messages? Get higher limits with Premium.
         <Button variant="link" className="text-blue-400 ml-2">

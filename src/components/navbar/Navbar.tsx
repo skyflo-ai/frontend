@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 import { Home, Menu, History, Flag } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { RiRobot3Line } from "react-icons/ri";
 
 type User = {
   email: string;
@@ -31,14 +33,22 @@ export default function Navbar({
   user: User;
   clearFlowData: () => void;
 }) {
+  const router = useRouter();
+
+  const handleAgentsButtonClick = () => {
+    router.push("/agents");
+  };
+
   return (
     <nav className="h-screen w-16 bg-dark-navbar flex flex-col items-center justify-center py-4 border-r border-border">
       {/* Logo placeholder */}
       <div className="w-10 h-10 rounded-full mb-8">
-        <img
-          src="/logo_v1.webp"
+        <Image
+          src="/logo_v2_transparent.png"
           alt="logo"
-          className="w-full h-full rounded-full"
+          width={40}
+          height={40}
+          className="rounded-full"
         />
       </div>
 
@@ -46,9 +56,9 @@ export default function Navbar({
         {/* Nav icons */}
         <div className="flex-grow text-center space-y-3 mt-auto">
           <NavIcon
-            icon={<Home size={20} />}
-            tooltip="Home"
-            onClick={() => clearFlowData()}
+            icon={<RiRobot3Line size={20} />}
+            tooltip="Agents"
+            onClick={() => handleAgentsButtonClick()}
           />
           <NavIcon icon={<History size={20} />} tooltip="History" />
           <NavIcon icon={<Flag size={20} />} tooltip="Feedback" />

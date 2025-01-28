@@ -15,7 +15,7 @@ import { FaGoogle, FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden">
+    <div className="relative   flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black to-gray-900" />
       <div className="absolute top-1/3 -left-1/3 sm:top-1/4 sm:-left-1/4 w-1/3 sm:w-1/2 h-1/3 sm:h-1/2 bg-blue-500/20 blur-[128px] rounded-full" />

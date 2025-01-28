@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import dynamic from "next/dynamic";
+import { AgentProvider } from "@/contexts/AgentContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-dark text-gray-200`}>
-        <AuthProvider>{children}</AuthProvider>
+        <AgentProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </AgentProvider>
       </body>
     </html>
   );

@@ -2,7 +2,11 @@
 
 import { cookies } from "next/headers";
 
-export async function handleAuth(formData: FormData) {
+type AuthResult =
+  | { success: true; user: any; error?: undefined }
+  | { success: false; error: string };
+
+export async function handleAuth(formData: FormData): Promise<AuthResult> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const isLogin = formData.get("authType") === "login";
@@ -19,6 +23,7 @@ export async function handleAuth(formData: FormData) {
     );
 
     if (response.ok) {
+      const userData = await response.json();
       const setCookieHeader = response.headers.get("set-cookie");
 
       if (setCookieHeader) {
@@ -37,7 +42,7 @@ export async function handleAuth(formData: FormData) {
         });
       }
 
-      return { success: true };
+      return { success: true, user: userData };
     } else {
       return { success: false, error: "Authentication failed" };
     }
@@ -47,10 +52,10 @@ export async function handleAuth(formData: FormData) {
   }
 }
 
-function getSameSite(cookieStr: string): "Strict" | "Lax" | "None" | undefined {
-  if (cookieStr.includes("SameSite=None")) return "None";
-  if (cookieStr.includes("SameSite=Strict")) return "Strict";
-  if (cookieStr.includes("SameSite=Lax")) return "Lax";
+function getSameSite(cookieStr: string): "strict" | "lax" | "none" | undefined {
+  if (cookieStr.includes("SameSite=None")) return "none";
+  if (cookieStr.includes("SameSite=Strict")) return "strict";
+  if (cookieStr.includes("SameSite=Lax")) return "lax";
   return undefined;
 }
 

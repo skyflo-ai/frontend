@@ -1,3 +1,5 @@
+// src/components/Onboarding.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -11,230 +13,615 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FaAws } from "react-icons/fa";
-import { SiGooglecloud } from "react-icons/si";
+import { SiGooglecloud, SiKubernetes } from "react-icons/si";
 import { VscAzure } from "react-icons/vsc";
-
 import { Button } from "@/components/ui/button";
+import { kubernetesInstallManifests } from "@/lib/constants/kubernetes-install-manifests";
+import { Loader2 } from "lucide-react";
 
-// Performance & Security Considerations:
-// - Sensitive credentials should be encrypted before storage.
-// - Communicate to the user how credentials are handled securely.
-// - Introduce a consistent minimum height for content containers to minimize layout shift.
-// - Use memoization or lazy loading for complex operations if the component grows in complexity.
+import { useRouter } from "next/navigation";
+import { CodeBlock } from "@/components/ui/code-block";
+import { onboardingMarkdownComponents } from "@/components/ui/onboarding-markdown-components";
+import { HiMiniSparkles } from "react-icons/hi2";
 
+type Step =
+  | "selectProvider"
+  // AWS Steps
+  | "awsCreateIamUser"
+  | "awsEnterIamUserCredentials"
+  // Kubernetes Steps
+  | "kubernetesInstallHelmChart"
+  | "kubernetesTestConnection";
+
+type Provider = "aws" | "kubernetes" | null;
+
+function AWSSetup({
+  step,
+  // We'll expose these states to parent or keep them local and provide getters.
+  // For simplicity, we store them here and call parent callbacks when finishing.
+  awsAccessKeyId,
+  setAwsAccessKeyId,
+  awsSecretAccessKey,
+  setAwsSecretAccessKey,
+  awsRegion,
+  setAwsRegion,
+}: {
+  step: "awsCreateIamUser" | "awsEnterIamUserCredentials";
+  awsAccessKeyId: string;
+  setAwsAccessKeyId: React.Dispatch<React.SetStateAction<string>>;
+  awsSecretAccessKey: string;
+  setAwsSecretAccessKey: React.Dispatch<React.SetStateAction<string>>;
+  awsRegion: string;
+  setAwsRegion: React.Dispatch<React.SetStateAction<string>>;
+}) {
+  // Step 1: AWS IAM instructions
+  if (step === "awsCreateIamUser") {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-600/10 to-blue-500/10">
+            <HiMiniSparkles className="w-4 h-4 text-blue-400" />
+          </div>
+          <p className="text-gray-300 text-sm font-semibold tracking-tight">
+            Follow these steps to create a new IAM user
+          </p>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-50 rounded-xl" />
+          <CodeBlock
+            code="aws iam create-user --user-name Skyflo_Read_Only_User"
+            language="bash"
+            showLineNumbers={false}
+          />
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-50 rounded-xl" />
+          <CodeBlock
+            code="aws iam attach-user-policy --user-name Skyflo_Read_Only_User --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess"
+            language="bash"
+            showLineNumbers={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Step 2: AWS Credentials
+  if (step === "awsEnterIamUserCredentials") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="space-y-6"
+      >
+        <div className="relative group">
+          <label
+            className="block text-gray-400 text-xs font-semibold mb-2 tracking-wide"
+            htmlFor="accessKeyId"
+          >
+            IAM User Access Key ID
+          </label>
+          <div className="relative pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 rounded-xl" />
+            <input
+              id="accessKeyId"
+              type="text"
+              className="relative pointer-events-auto w-full px-4 py-3 bg-gradient-to-br from-gray-900/90 to-gray-800/90 text-gray-300 text-sm rounded-xl
+                border border-gray-800/50 focus:border-blue-400/50
+                shadow-lg shadow-gray-950/50 focus:shadow-xl focus:shadow-blue-900/20
+                outline-none transition-all duration-500
+                placeholder:text-gray-600"
+              value={awsAccessKeyId}
+              onChange={(e) => setAwsAccessKeyId(e.target.value)}
+              placeholder="Enter your AWS Access Key ID"
+            />
+          </div>
+        </div>
+
+        <div className="relative group">
+          <label
+            className="block text-gray-400 text-xs font-semibold mb-2 tracking-wide"
+            htmlFor="secretAccessKey"
+          >
+            IAM User Access Secret
+          </label>
+          <div className="relative pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 rounded-xl" />
+            <input
+              id="secretAccessKey"
+              type="password"
+              className="relative pointer-events-auto w-full px-4 py-3 bg-gradient-to-br from-gray-900/90 to-gray-800/90 text-gray-300 text-sm rounded-xl
+                border border-gray-800/50 focus:border-blue-400/50
+                shadow-lg shadow-gray-950/50 focus:shadow-xl focus:shadow-blue-900/20
+                outline-none transition-all duration-500
+                placeholder:text-gray-600"
+              value={awsSecretAccessKey}
+              onChange={(e) => setAwsSecretAccessKey(e.target.value)}
+              placeholder="Enter your AWS Secret Access Key"
+            />
+          </div>
+        </div>
+
+        <div className="relative group">
+          <label
+            className="block text-gray-400 text-xs font-semibold mb-2 tracking-wide"
+            htmlFor="region"
+          >
+            Region
+          </label>
+          <div className="relative pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 rounded-xl" />
+            <input
+              id="region"
+              type="text"
+              className="relative pointer-events-auto w-full px-4 py-3 bg-gradient-to-br from-gray-900/90 to-gray-800/90 text-gray-300 text-sm rounded-xl
+                border border-gray-800/50 focus:border-blue-400/50
+                shadow-lg shadow-gray-950/50 focus:shadow-xl focus:shadow-blue-900/20
+                outline-none transition-all duration-500
+                placeholder:text-gray-600"
+              value={awsRegion}
+              onChange={(e) => setAwsRegion(e.target.value)}
+              placeholder="e.g. us-west-2"
+            />
+          </div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="flex items-center space-x-2 text-xs text-gray-500 mt-8 bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-4 rounded-xl border border-gray-800/30"
+        >
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-600/10 to-blue-500/10"></div>
+          <p className="leading-relaxed">
+            Your credentials will be encrypted and stored securely. We follow
+            industry best practices for data protection.
+          </p>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  return null;
+}
+
+function KubernetesSetup({
+  step,
+  helmChartRepo,
+  setHelmChartRepo,
+  helmChartName,
+  setHelmChartName,
+  kubeConfig,
+  setKubeConfig,
+}: {
+  step: "kubernetesInstallHelmChart" | "kubernetesTestConnection";
+  helmChartRepo: string;
+  setHelmChartRepo: React.Dispatch<React.SetStateAction<string>>;
+  helmChartName: string;
+  setHelmChartName: React.Dispatch<React.SetStateAction<string>>;
+  kubeConfig: string;
+  setKubeConfig: React.Dispatch<React.SetStateAction<string>>;
+}) {
+  // Step 1: Install Helm Chart
+  if (step === "kubernetesInstallHelmChart") {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-600/10 to-blue-500/10">
+            <HiMiniSparkles className="w-4 h-4 text-blue-400" />
+          </div>
+          <p className="text-gray-300 text-sm font-semibold tracking-tight">
+            Install the following manifests to your Kubernetes cluster
+          </p>
+        </div>
+
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-50 rounded-xl" />
+          <CodeBlock
+            code={kubernetesInstallManifests}
+            language="yaml"
+            showLineNumbers={false}
+          />
+        </div>
+
+        <div className="relative mt-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-50 rounded-xl" />
+          <CodeBlock
+            code="kubectl apply -f install-skyflo.yaml"
+            language="bash"
+            showLineNumbers={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Step 2: Test Connection
+  if (step === "kubernetesTestConnection") {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-6 py-8">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent blur-xl" />
+          <div className="relative bg-gradient-to-br from-blue-600/10 to-blue-500/10 p-4 rounded-xl shadow-lg shadow-blue-500/5 backdrop-blur-sm">
+            <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+          </div>
+        </div>
+        <div className="text-center space-y-2">
+          <p className="text-sm text-gray-500">
+            Establishing connection to your Kubernetes cluster...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+/**
+ * Main Onboarding Component
+ */
 export default function ConnectCloudPage() {
-  const [step, setStep] = useState<
-    "selectProvider" | "viewPolicy" | "enterCredentials"
-  >("selectProvider");
-  const [selectedProvider, setSelectedProvider] = useState<"aws" | null>(null);
-  const [accessKeyId, setAccessKeyId] = useState("");
-  const [secretAccessKey, setSecretAccessKey] = useState("");
-  const [region, setRegion] = useState("");
+  // Steps
+  type Step =
+    | "selectProvider"
+    | "awsCreateIamUser"
+    | "awsEnterIamUserCredentials"
+    | "kubernetesInstallHelmChart"
+    | "kubernetesTestConnection";
 
-  const handleSelectProvider = (provider: "aws") => {
+  const [step, setStep] = useState<Step>("selectProvider");
+  const [selectedProvider, setSelectedProvider] = useState<
+    "aws" | "kubernetes" | null
+  >(null);
+
+  // AWS form states
+  const [awsAccessKeyId, setAwsAccessKeyId] = useState("");
+  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState("");
+  const [awsRegion, setAwsRegion] = useState("");
+
+  // K8s form states
+  const [helmChartRepo, setHelmChartRepo] = useState(
+    "https://charts.helm.sh/stable"
+  );
+  const [helmChartName, setHelmChartName] = useState("skyflo");
+  const [kubeConfig, setKubeConfig] = useState("");
+
+  const router = useRouter();
+
+  // Provider selection
+  const handleSelectProvider = (provider: "aws" | "kubernetes") => {
     setSelectedProvider(provider);
-    setStep("viewPolicy");
+    console.log(provider);
+    if (provider === "aws") {
+      setStep("awsCreateIamUser");
+    } else {
+      setStep("kubernetesInstallHelmChart");
+    }
   };
 
-  const handleNextFromPolicy = () => {
-    setStep("enterCredentials");
-  };
-
+  // Single back logic
   const handleBack = () => {
-    if (step === "viewPolicy") {
+    if (step === "awsCreateIamUser" || step === "kubernetesInstallHelmChart") {
       setSelectedProvider(null);
       setStep("selectProvider");
-      return;
-    }
-    if (step === "enterCredentials") {
-      setStep("viewPolicy");
-      return;
+    } else if (step === "awsEnterIamUserCredentials") {
+      setStep("awsCreateIamUser");
+    } else if (step === "kubernetesTestConnection") {
+      setStep("kubernetesInstallHelmChart");
     }
   };
 
-  // A consistent minimum height for the card content to reduce layout shifts.
-  const contentMinHeight = "min-h-[400px]";
+  // Example finish handlers
+  const finishAWS = async () => {
+    setTimeout(() => {
+      router.push("/agents");
+    }, 1000);
+  };
+
+  const finishKubernetes = async () => {
+    setTimeout(() => {
+      router.push("/agents");
+    }, 1000);
+  };
+
+  // Render logic for the main content area
+  const renderStepContent = () => {
+    if (step === "selectProvider") {
+      return (
+        <div className="grid grid-cols-2 gap-8">
+          {/* AWS */}
+          <motion.button
+            onClick={() => handleSelectProvider("aws")}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+            className="group relative flex flex-col items-center justify-center 
+                       h-[220px] rounded-4xl overflow-hidden 
+                       transition-all duration-500
+                       shadow-md shadow-gray-800/30"
+            /* ↑ subtle, minimalistic box shadow */
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-gray-900/98 
+                         to-gray-800/98 border border-gray-800/30 rounded-2xl 
+                         transition-all duration-500 
+                         group-hover:border-blue-500/30 group-hover:shadow-2xl 
+                         group-hover:shadow-blue-500/20"
+            />
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-blue-500/5 
+                         via-transparent to-transparent opacity-0 
+                         group-hover:opacity-100 transition-opacity duration-500"
+            />
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="p-4 
+                           rounded-xl shadow-lg shadow-blue-500/5 backdrop-blur-sm
+                           transform group-hover:scale-110 group-hover:shadow-xl 
+                           group-hover:shadow-blue-500/10 transition-all duration-500"
+              >
+                <FaAws className="w-7 h-7 text-blue-400" />
+              </div>
+              <p
+                className="mt-4 text-sm font-semibold tracking-tight bg-gradient-to-r from-gray-100
+                           to-gray-300 bg-clip-text text-transparent
+                           group-hover:from-blue-400 group-hover:to-blue-300
+                           transition-all duration-500"
+              >
+                AWS
+              </p>
+            </div>
+          </motion.button>
+
+          {/* Kubernetes */}
+          <motion.button
+            onClick={() => handleSelectProvider("kubernetes")}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+            className="group relative flex flex-col items-center justify-center 
+                       h-[220px] rounded-2xl overflow-hidden
+                       transition-all duration-500
+                       shadow-md shadow-gray-800/30"
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-gray-900/98
+                         to-gray-800/98 border border-gray-800/30 rounded-2xl
+                         transition-all duration-500
+                         group-hover:border-blue-500/30 group-hover:shadow-2xl
+                         group-hover:shadow-blue-500/20"
+            />
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-blue-500/5 
+                         via-transparent to-transparent opacity-0
+                         group-hover:opacity-100 transition-opacity duration-500"
+            />
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="p-4 
+                           rounded-xl shadow-lg shadow-blue-500/5 backdrop-blur-sm
+                           transform group-hover:scale-110 group-hover:shadow-xl 
+                           group-hover:shadow-blue-500/10 transition-all duration-500"
+              >
+                <SiKubernetes className="w-7 h-7 text-blue-400" />
+              </div>
+              <p
+                className="mt-4 text-sm font-medium bg-gradient-to-r from-gray-100
+                           to-gray-300 bg-clip-text text-transparent
+                           group-hover:from-blue-400 group-hover:to-blue-300
+                           transition-all duration-500"
+              >
+                Kubernetes
+              </p>
+            </div>
+          </motion.button>
+
+          {/* Azure (Coming Soon) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="group relative flex flex-col items-center justify-center
+                       h-[220px] rounded-2xl overflow-hidden cursor-not-allowed
+                       shadow-md shadow-gray-800/30"
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-gray-900/80
+                            to-gray-800/80 border border-gray-800/20 rounded-2xl"
+            />
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 
+                           p-4 rounded-xl shadow-lg backdrop-blur-sm"
+              >
+                <VscAzure className="w-7 h-7 text-gray-600" />
+              </div>
+              <div className="mt-4 flex flex-col items-center">
+                <p className="text-sm font-medium text-gray-600">Azure</p>
+                <span
+                  className="mt-2 text-[10px] font-medium text-gray-700 
+                             px-2 py-0.5 rounded-full bg-gray-800/50 
+                             border border-gray-700/30"
+                >
+                  Coming Soon
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* GCP (Coming Soon) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="group relative flex flex-col items-center justify-center
+                       h-[220px] rounded-2xl overflow-hidden cursor-not-allowed
+                       shadow-md shadow-gray-800/30"
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-gray-900/80
+                            to-gray-800/80 border border-gray-800/20 rounded-2xl"
+            />
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="bg-gradient-to-br from-gray-800/50 to-gray-700/50 
+                           p-4 rounded-xl shadow-lg backdrop-blur-sm"
+              >
+                <SiGooglecloud className="w-7 h-7 text-gray-600" />
+              </div>
+              <div className="mt-4 flex flex-col items-center">
+                <p className="text-sm font-medium text-gray-600">GCP</p>
+                <span
+                  className="mt-2 text-[10px] font-medium text-gray-700
+                             px-2 py-0.5 rounded-full bg-gray-800/50
+                             border border-gray-700/30"
+                >
+                  Coming Soon
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      );
+    }
+
+    if (selectedProvider === "aws") {
+      return (
+        <AWSSetup
+          step={step as "awsCreateIamUser" | "awsEnterIamUserCredentials"}
+          awsAccessKeyId={awsAccessKeyId}
+          setAwsAccessKeyId={setAwsAccessKeyId}
+          awsSecretAccessKey={awsSecretAccessKey}
+          setAwsSecretAccessKey={setAwsSecretAccessKey}
+          awsRegion={awsRegion}
+          setAwsRegion={setAwsRegion}
+        />
+      );
+    }
+
+    if (selectedProvider === "kubernetes") {
+      return (
+        <KubernetesSetup
+          step={
+            step as "kubernetesInstallHelmChart" | "kubernetesTestConnection"
+          }
+          helmChartRepo={helmChartRepo}
+          setHelmChartRepo={setHelmChartRepo}
+          helmChartName={helmChartName}
+          setHelmChartName={setHelmChartName}
+          kubeConfig={kubeConfig}
+          setKubeConfig={setKubeConfig}
+        />
+      );
+    }
+
+    return null;
+  };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black to-gray-900" />
-      <div className="absolute top-1/3 -left-1/3 sm:top-1/4 sm:-left-1/4 w-1/3 sm:w-1/2 h-1/3 sm:h-1/2 bg-blue-500/20 blur-[128px] rounded-full" />
-      <div className="absolute top-1/3 -right-1/3 sm:top-1/4 sm:-right-1/4 w-1/3 sm:w-1/2 h-1/3 sm:h-1/2 bg-cyan-500/20 blur-[128px] rounded-full" />
+    <div className=" flex items-center justify-center min-h-screen px-4 sm:px-6 md:px-8  ">
+      {/* Ambient background effect */}
+      <div className="absolute inset-0 -top-40">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent blur-3xl" />
+        <div className="absolute right-0 top-0 bg-gradient-to-b from-cyan-400/10 via-transparent to-transparent w-96 h-96 blur-3xl" />
+      </div>
 
-      {/* Main Onboarding Card */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative w-full max-w-[600px]"
-      >
-        <Card className="bg-dark-secondary border-gray-700 shadow-2xl rounded-xl overflow-hidden">
-          <CardHeader className="px-6 sm:px-8 bg-gradient-to-r from-dark-secondary to-dark-navbar">
-            <CardTitle className="text-2xl mb-2 sm:text-3xl font-bold text-white tracking-normal flex items-center justify-center">
-              Connect Your Cloud
+      <Card className="z-10 bg-gradient-to-br from-gray-900/98 to-gray-800/98 border-gray-800/30 shadow-2xl hover:shadow-3xl hover:shadow-blue-500/10 rounded-2xl overflow-hidden w-full max-w-[600px] transition-all duration-500">
+        {step === "selectProvider" && (
+          <CardHeader className="px-8 py-6 bg-gradient-to-br from-gray-900/98 to-gray-800/98 border-b border-gray-800/30">
+            <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight text-center">
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent px-1 relative">
+                Connect Your Cloud
+              </span>
             </CardTitle>
-            <CardDescription className="text-center text-gray-400 text-xs sm:text-sm">
-              Integrate your cloud provider to start monitoring and optimizing
-              resources.
+            <CardDescription className="text-center text-gray-400 text-xs font-semibold">
+              Select a provider to get started.
             </CardDescription>
           </CardHeader>
+        )}
 
-          <CardContent
-            className={`px-6 sm:px-8 transition-all duration-500 ${contentMinHeight} flex flex-col justify-center`}
-          >
-            {step === "selectProvider" && (
-              <div className="grid grid-cols-3 gap-4">
-                {/* AWS */}
-                <button
-                  onClick={() => handleSelectProvider("aws")}
-                  className="flex flex-col items-center justify-center bg-gray-800 text-white py-8 px-4 rounded-lg hover:bg-gray-700 shadow-lg transition-transform duration-200 ease-in-out cursor-pointer"
-                >
-                  <FaAws className="text-4xl mb-2" />
-                  <p className="font-semibold text-sm">AWS</p>
-                </button>
+        {(step === "kubernetesTestConnection" ||
+          step === "awsEnterIamUserCredentials") && (
+          <CardHeader className="px-8 py-6 bg-gradient-to-br from-gray-900/98 to-gray-800/98 border-b border-gray-800/30">
+            <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight text-center">
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent px-1 relative">
+                {step === "kubernetesTestConnection"
+                  ? "Testing Connection"
+                  : "Enter AWS Credentials"}
+              </span>
+            </CardTitle>
+          </CardHeader>
+        )}
 
-                {/* Azure (Coming Soon) */}
-                <div className="flex flex-col items-center justify-center bg-gray-800 text-white py-8 px-4 rounded-lg shadow-lg cursor-not-allowed opacity-50 relative">
-                  <VscAzure className="text-4xl mb-2" />
-                  <p className="font-semibold text-sm">Azure</p>
-                  <span className="absolute bottom-2 text-xs text-gray-400 italic">
-                    Coming Soon
-                  </span>
-                </div>
+        <CardContent className="p-8 flex flex-col justify-center min-h-[550px] ">
+          {renderStepContent()}
+        </CardContent>
 
-                {/* GCP (Coming Soon) */}
-                <div className="flex flex-col items-center justify-center bg-gray-800 text-white py-8 px-4 rounded-lg shadow-lg cursor-not-allowed opacity-50 relative">
-                  <SiGooglecloud className="text-4xl mb-2" />
-                  <p className="font-semibold text-sm">GCP</p>
-                  <span className="absolute bottom-2 text-xs text-gray-400 italic">
-                    Coming Soon
-                  </span>
-                </div>
-              </div>
-            )}
+        <CardFooter
+          className={`px-8 py-6 flex justify-between items-center bg-gradient-to-br from-gray900/50 to-gray-800/50 ${
+            step !== "selectProvider" ? "border-none" : "border-none"
+          }`}
+        >
+          {step !== "selectProvider" && (
+            <Button
+              variant="secondary"
+              className="text-gray-400 hover:bg-gray-300 hover:text-blue-950 font-semibold transition-all duration-300"
+              onClick={handleBack}
+            >
+              Back
+            </Button>
+          )}
 
-            {step === "viewPolicy" && selectedProvider === "aws" && (
-              <div className="text-gray-300 text-sm space-y-8">
-                <div>
-                  <p className="mb-2 font-semibold">
-                    1. Create a new IAM User:
-                  </p>
-                  <pre className="bg-gray-800 rounded-lg p-4 text-xs overflow-auto shadow-inner text-gray-200">
-                    aws iam create-user --user-name Skyflo_Read_Only_User
-                  </pre>
-                </div>
-
-                <div>
-                  <p className="mb-2 font-semibold">
-                    2. Attach the AWS Managed ReadOnlyAccess Policy:
-                  </p>
-                  <pre className="bg-gray-800 rounded-lg p-4 text-xs overflow-auto shadow-inner text-gray-200">
-                    aws iam attach-user-policy --user-name Skyflo_Read_Only_User
-                    --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
-                  </pre>
-                </div>
-              </div>
-            )}
-
-            {step === "enterCredentials" && selectedProvider === "aws" && (
-              <div>
-                <div className="mb-4">
-                  <label
-                    className="block text-gray-300 text-sm font-semibold mb-2"
-                    htmlFor="accessKeyId"
-                  >
-                    IAM User Access Key ID
-                  </label>
-                  <input
-                    id="accessKeyId"
-                    type="text"
-                    className="bg-gray-800 text-white w-full rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    value={accessKeyId}
-                    onChange={(e) => setAccessKeyId(e.target.value)}
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label
-                    className="block text-gray-300 text-sm font-semibold mb-2"
-                    htmlFor="secretAccessKey"
-                  >
-                    IAM User Access Secret
-                  </label>
-                  <input
-                    id="secretAccessKey"
-                    type="password"
-                    className="bg-gray-800 text-white w-full rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    value={secretAccessKey}
-                    onChange={(e) => setSecretAccessKey(e.target.value)}
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label
-                    className="block text-gray-300 text-sm font-semibold mb-2"
-                    htmlFor="region"
-                  >
-                    Region
-                  </label>
-                  <input
-                    id="region"
-                    type="text"
-                    className="bg-gray-800 text-white w-full rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
-                  />
-                </div>
-
-                <p className="text-xs text-gray-400 mt-2">
-                  These credentials will be stored securely. We do not store
-                  them as plain text. They will be encrypted using
-                  industry-standard security practices.
-                </p>
-              </div>
-            )}
-          </CardContent>
-
-          <CardFooter
-            className={`min-h-[90px] px-6 sm:px-8 py-4 flex justify-between items-center bg-dark-secondary ${
-              step !== "selectProvider"
-                ? "border-t border-gray-700"
-                : "border-none"
-            }`}
-          >
-            {step !== "selectProvider" && (
+          {/* AWS steps */}
+          {step === "awsCreateIamUser" && selectedProvider === "aws" && (
+            <Button
+              variant="default"
+              className="bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800 font-semibold transition-all duration-300"
+              onClick={() => setStep("awsEnterIamUserCredentials")}
+            >
+              Next
+            </Button>
+          )}
+          {step === "awsEnterIamUserCredentials" &&
+            selectedProvider === "aws" && (
               <Button
-                variant="secondary"
-                className="bg-gray-700 hover:bg-gray-600 text-white"
-                onClick={handleBack}
-              >
-                Back
-              </Button>
-            )}
-            {step === "viewPolicy" && selectedProvider === "aws" && (
-              <Button
-                variant="primary"
-                className="bg-blue-900 hover:bg-blue-600 text-white ml-auto"
-                onClick={handleNextFromPolicy}
-              >
-                Next
-              </Button>
-            )}
-            {step === "enterCredentials" && (
-              <Button
-                variant="primary"
-                className="bg-blue-900 hover:bg-blue-600 text-white ml-auto"
-                onClick={() => {
-                  // TODO: Handle form submission, securely send encrypted credentials to backend
-                }}
+                variant="default"
+                className="bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800 font-semibold transition-all duration-300"
+                onClick={finishAWS}
               >
                 Finish
               </Button>
             )}
-          </CardFooter>
-        </Card>
-      </motion.div>
+
+          {/* Kubernetes steps */}
+          {step === "kubernetesInstallHelmChart" &&
+            selectedProvider === "kubernetes" && (
+              <Button
+                variant="default"
+                className="bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800 font-semibold transition-all duration-300"
+                onClick={() => setStep("kubernetesTestConnection")}
+              >
+                Next
+              </Button>
+            )}
+          {step === "kubernetesTestConnection" &&
+            selectedProvider === "kubernetes" && (
+              <Button
+                variant="default"
+                className="bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800 font-semibold transition-all duration-300"
+                onClick={finishKubernetes}
+              >
+                Finish
+              </Button>
+            )}
+        </CardFooter>
+      </Card>
     </div>
   );
 }

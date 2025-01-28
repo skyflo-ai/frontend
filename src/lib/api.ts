@@ -1,25 +1,28 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { Agent } from "./types/agent";
 
-export async function queryAgent(agent: Agent, query: string) {
+export async function queryAgent(query: string, agentPath: string | null) {
+  console.log(
+    `${process.env.API_URL}/agents/${agentPath}/chat/?query=${query}`
+  );
   try {
     const nextCookies = cookies().getAll();
     const cookieHeader = nextCookies
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
-    const params = new URLSearchParams({ query: query });
 
-    const response = await fetch(`${process.env.API_URL}/agents`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieHeader,
-      },
-      body: JSON.stringify({ agent, query }),
-    });
+    const response = await fetch(
+      `${process.env.API_URL}/agents/${agentPath}/chat/?query=${query}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieHeader,
+        },
+      }
+    );
 
     if (!response.ok) {
       const errorMessage = await response.text();

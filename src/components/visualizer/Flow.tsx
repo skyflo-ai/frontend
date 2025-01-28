@@ -24,6 +24,7 @@ import { RiDownloadLine } from "react-icons/ri";
 import { downloadImage } from "@/lib/utils";
 
 function Flow({ flowData, isLoading }: { flowData: any; isLoading: boolean }) {
+  console.log("flowData", flowData);
   return (
     <>
       {isLoading ? (
@@ -34,7 +35,7 @@ function Flow({ flowData, isLoading }: { flowData: any; isLoading: boolean }) {
             <div className="dots w-12"></div>
           </div>
         </div>
-      ) : flowData ? (
+      ) : !isLoading && flowData ? (
         <RenderedFlow flowData={flowData} />
       ) : (
         <div className="flex items-center justify-center h-full w-full">

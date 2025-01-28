@@ -65,15 +65,15 @@ export function TooltipContent({
   if (!open) return null;
 
   const sideClasses = {
-    top: "bottom-full left-1/2 -translate-x-1/2 mb-3",
-    right: "left-full top-1/2 -translate-y-1/2 ml-2",
-    bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
-    left: "right-full top-1/2 -translate-y-1/2 mr-2",
+    top: "bottom-full left-1/2 -translate-x-1/2 mb-3 whitespace-nowrap",
+    right: "left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap",
+    bottom: "top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap",
+    left: "right-full top-1/2 -translate-y-1/2 mr-2 whitespace-nowrap",
   };
 
   return (
     <div
-      className={`absolute z-10 p-2 border border-border-menu text-xs text-white bg-dark-navbar rounded shadow-lg ${sideClasses[side]}`}
+      className={`absolute z-10 px-3 py-1.5 border border-border-menu text-xs text-white bg-dark-navbar rounded shadow-lg ${sideClasses[side]}`}
     >
       {children}
     </div>

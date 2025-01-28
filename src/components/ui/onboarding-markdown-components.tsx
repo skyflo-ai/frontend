@@ -11,8 +11,7 @@ interface CodeProps extends MarkdownProps {
   className?: string;
 }
 
-// The sub-list should be indented and have a different bullet style
-export const markdownComponents = {
+export const onboardingMarkdownComponents = {
   h1: ({ node, ...props }: MarkdownProps) => (
     <h1
       className="text-2xl tracking-wide leading-loose text-white font-bold my-4"
@@ -38,11 +37,7 @@ export const markdownComponents = {
     const match = /language-(\w+)/.exec(className || "");
     const language = match ? match[1] : undefined;
 
-    // Single backtick code is inline and has no language class
-    if (
-      inline ||
-      (!language && typeof children === "string" && !children.includes("\n"))
-    ) {
+    if (inline) {
       return (
         <code
           className="bg-gray-800 leading-loose text-pink-500 px-2 py-1 rounded-md"
