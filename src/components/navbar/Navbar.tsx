@@ -44,7 +44,7 @@ export default function Navbar({
       {/* Logo placeholder */}
       <div className="w-10 h-10 rounded-full mb-8">
         <Image
-          src="/logo_v2_transparent.png"
+          src="/logo.png"
           alt="logo"
           width={40}
           height={40}

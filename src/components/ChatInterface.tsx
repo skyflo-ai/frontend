@@ -177,13 +177,7 @@ export function ChatInterface({ selectedAgent }: ChatInterfaceProps) {
       role: message.from === "user" ? "user" : "assistant",
       content: message.message,
       timestamp: message.timestamp || Date.now(),
-      conversationId: message.conversationId || "default",
       contextMarker: message.contextMarker || "standard",
-      metadata: {
-        isFollowUp: false,
-        referencesContext: false,
-        requiresContext: false,
-      },
       latest: false,
     }));
 
@@ -192,23 +186,12 @@ export function ChatInterface({ selectedAgent }: ChatInterfaceProps) {
       role: "user",
       content: inputValue.trim(),
       timestamp: Date.now(),
-      conversationId:
-        messages.length > 0
-          ? messages[messages.length - 1].conversationId || "default"
-          : "new-conversation",
       contextMarker: "latest-query",
-      metadata: {
-        isFollowUp: messages.length > 0,
-        referencesContext: messages.length > 0,
-        requiresContext: true,
-      },
       latest: true,
     });
 
-    chatHistory.sort((a, b) => {
-      if (a.latest !== b.latest) return a.latest ? -1 : 1;
-      return b.timestamp - a.timestamp;
-    });
+    // reverse the chat history
+    chatHistory.reverse();
 
     const chatHistoryString = JSON.stringify(chatHistory);
 
@@ -385,7 +368,7 @@ export function ChatInterface({ selectedAgent }: ChatInterfaceProps) {
               </div>
             </div>
 
-            <div className="pb-4">
+            <div className="pb-4 px-4">
               <form
                 onSubmit={handleSubmit}
                 className="flex items-center justify-between w-full max-w-4xl mx-auto relative "
@@ -460,7 +443,7 @@ export function ChatInterface({ selectedAgent }: ChatInterfaceProps) {
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ duration: 0.3 }}
-                className="bg-dark border-l border-border w-full max-w-xs h-full flex flex-col"
+                className="bg-dark border-l border-border w-full max-w-lg flex flex-col overflow-y-auto max-h-screen"
               >
                 <div className="flex justify-between items-center border-b border-border p-4">
                   <p className="text-sm text-gray-300 text-left">

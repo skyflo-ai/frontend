@@ -10,7 +10,7 @@ export const Agents: Agent[] = [
     title: "AWS Agent",
     path: "aws",
     pusherChannel: "aws",
-    description: "Enterprise-Grade AWS Cloud Assistant",
+    description: "Your personal AWS Copilot",
     detailed_description:
       "Optimize costs, enhance security posture, and streamline AWS operations through AI-powered analysis and actionable infrastructure recommendations.",
     icon: FaAws,
